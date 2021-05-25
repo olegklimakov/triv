@@ -1,11 +1,15 @@
 {
-  "name": "project-starter-cli",
-  "version": "0.0.0",
-  "description": "Starter for your projects. With this tools it is ez to start development with your favorite tools",
+  "name": "triv",
+  "version": "1.0.0",
+  "description": "Tools which allows you to automate your routine. Starter for your projects. With this tools it is ez to start development with your favorite tools",
   "main": "index.js",
   "scripts": {
+    "dev": "ts-node src/index.ts",
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "triv": "./dist/index.js"
   },
   "keywords": [
     "js",
@@ -13,14 +17,15 @@
     "nodejs",
     "cli"
   ],
-  "author": "Oleg Klimakov",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/olegklimakov/triv.git"
+  },
+  "author": "Oleg Klimakov (klimakov.me)",
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^15.6.0",
     "ts-node": "^10.0.0",
     "typescript": "^4.2.4"
-  },
-  "dependencies": {
-    "settings-storage": "git+https://github.com/olegklimakov/settings-storage.git"
   }
 }
