@@ -31,21 +31,37 @@ const handleInstructions = async (instructionPath: string, repoName: string): Pr
     throw Error
   }
   log('Apply instruction')
-  if (instruction?.devPackages) {
-    // todo add version support
-    const packagesCommand = `npm i ${instruction.devPackages.join(' ')} --save-dev`;
-    await execCommand(packagesCommand);
-  }
+  // if (instruction?.devPackages) {
+  //   // todo add version support
+  //   const packagesCommand = `npm i ${instruction.devPackages.join(' ')} --save-dev`;
+  //   await execCommand(packagesCommand);
+  // }
 
-  if(instruction?)
+  if (instruction?.packageJsonHooks?.length) {
+    for (let hook of instruction?.packageJsonHooks) {
+      const packageJson = await fsPromises.readFile(path + `/package.json`)
+      const parsedPackageJson = JSON.parse(packageJson);
+      const result = {
+        ...parsedPackageJson,
+        ...hook
+      }
+      console.log("RESULT", result);
+      try {
+        await fsPromises.writeFile(path + `/package.json`, JSON.stringify(result, null, 2));
+      } catch (e) {
+        console.log(e);
+      }
 
-  if (instruction?.files) {
-    for (let file of instruction.files) {
-      const pathToFile = `${repoName}/${instructionPath}/${file}`;
-      console.log(pathToFile);
-      await copyFile(pathToFile, file);
     }
   }
+
+  // if (instruction?.files) {
+  //   for (let file of instruction.files) {
+  //     const pathToFile = `${repoName}/${instructionPath}/${file}`;
+  //     console.log(pathToFile);
+  //     await copyFile(pathToFile, file);
+  //   }
+  // }
 
   if (instruction?.directories) {
     for (let dir of instruction.directories) {

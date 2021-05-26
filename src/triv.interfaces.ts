@@ -2,6 +2,7 @@ export interface TrivInstruction {
   directories?: TrivInstructionDirectory[];
   devPackages?: string[];
   files?: string[];
+  packageJsonHooks: JsonHook[]
 }
 
 export interface TrivJSON {
@@ -15,3 +16,6 @@ export interface TrivInstructionDirectory {
   path: string;
 }
 
+export interface JsonHook {
+  [key: string]: JsonHook;
+}
