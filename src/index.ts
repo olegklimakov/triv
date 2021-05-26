@@ -31,11 +31,11 @@ const handleInstructions = async (instructionPath: string, repoName: string): Pr
     throw Error
   }
   log('Apply instruction')
-  // if (instruction?.devPackages) {
-  //   // todo add version support
-  //   const packagesCommand = `npm i ${instruction.devPackages.join(' ')} --save-dev`;
-  //   await execCommand(packagesCommand);
-  // }
+  if (instruction?.devPackages) {
+    // todo add version support
+    const packagesCommand = `npm i ${instruction.devPackages.join(' ')} --save-dev`;
+    await execCommand(packagesCommand);
+  }
 
   if (instruction?.packageJsonHooks?.length) {
     for (let hook of instruction?.packageJsonHooks) {
@@ -55,13 +55,13 @@ const handleInstructions = async (instructionPath: string, repoName: string): Pr
     }
   }
 
-  // if (instruction?.files) {
-  //   for (let file of instruction.files) {
-  //     const pathToFile = `${repoName}/${instructionPath}/${file}`;
-  //     console.log(pathToFile);
-  //     await copyFile(pathToFile, file);
-  //   }
-  // }
+  if (instruction?.files) {
+    for (let file of instruction.files) {
+      const pathToFile = `${repoName}/${instructionPath}/${file}`;
+      console.log(pathToFile);
+      await copyFile(pathToFile, file);
+    }
+  }
 
   if (instruction?.directories) {
     for (let dir of instruction.directories) {
