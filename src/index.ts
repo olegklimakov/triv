@@ -1,57 +1,93 @@
 #!/usr/bin/env node
 
+import { log, LOG_TYPE } from './log';
+import { TrivInstruction, TrivJSON } from './triv.interfaces';
+
 const path = process.cwd();
 const { exec } = require('child_process')
 const fsPromises = require('fs').promises
+const SETTINGS_FILENAME = '.triv.json';
 
-console.log(path);
 const install = async () => {
-  const file = await fsPromises.readFile(path + '/proj-starter.json');
-  console.log(file);
-  const parsed = JSON.parse(file)
-  // await execCommand(`npm i ${parsed.repo} --save-dev`)
-  const installInstruction = await require(`${parsed.name}/tech/${parsed.folder}/install.js`);
-  console.log('PATH', installInstruction);
-  console.log('PACKAGE', installInstruction.packages);
+  try {
+    const file = await readJsonSettingsFile()
 
-  // if (installInstruction.packages?.length) {
-  //   const packagesCommand = `npm i ${installInstruction.packages.join(' ')} --save-dev`;
-  //   await execCommand(packagesCommand);
-  // }
+    if (typeof file !== 'object') { return }
+    log('Reading done', LOG_TYPE.success)
 
-  if (installInstruction.directories?.length) {
-    for (let item of installInstruction.directories) {
-      await handleNestedInstruction(parsed.name, item)
-    }
+    const parsed: TrivJSON = JSON.parse(file.toString())
+    await installRepositoryWithSettings(parsed.repo);
+    await handleInstructions(`tech/${parsed.folder}`, parsed.name)
+  } catch (err) {
+    log('Error occurred. Finish execution', LOG_TYPE.error)
   }
-  // const file = await fsPromises.readFile('')
 }
 
-const handleNestedInstruction = async (repositoryName: string, instruction: any) => {
-  const address = `${repositoryName}/${instruction.path}/install.js`
-  const installInstruction = await require(address);
+const handleInstructions = async (instructionPath: string, repoName: string): Promise<void | Error> => {
+  log(`Getting the instruction. Path: ${repoName}/${instructionPath}`)
+  const instruction = await getInstructionFromPackage(`${repoName}/${instructionPath}`)
 
-  // if (installInstruction?.devPackages) {
-  //   const packagesCommand = `npm i ${installInstruction.devPackages.join(' ')} --save-dev`;
-  //   await execCommand(packagesCommand);
-  // }
+  if (!instruction || (instruction instanceof Error)) {
+    throw Error
+  }
+  log('Apply instruction')
+  if (instruction?.devPackages) {
+    // todo add version support
+    const packagesCommand = `npm i ${instruction.devPackages.join(' ')} --save-dev`;
+    await execCommand(packagesCommand);
+  }
 
-  if (installInstruction?.files) {
-    for (let file of installInstruction.files) {
-      const pathToFile = `${repositoryName}/${instruction.path}/${file}`;
+  if(instruction?)
+
+  if (instruction?.files) {
+    for (let file of instruction.files) {
+      const pathToFile = `${repoName}/${instructionPath}/${file}`;
       console.log(pathToFile);
-      await copyFiles(pathToFile, file);
+      await copyFile(pathToFile, file);
     }
   }
-  // console.log(packagesCommand);
 
-  console.log(installInstruction);
+  if (instruction?.directories) {
+    for (let dir of instruction.directories) {
+      log(`Apply instruction ${dir.name}`)
+      await handleInstructions(dir.path, repoName);
+      log(`${dir.name} - Done`, LOG_TYPE.success)
+    }
+  }
 }
 
-const copyFiles = async (pathToFile: string, fileName: string) => {
+const getInstructionFromPackage = async (address: string): Promise<TrivInstruction | Error | undefined> => {
+  try {
+    return  await require(`${address}`);
+  } catch (err) {
+    log(`Error during getting instruction. Check Folder or Name params in your ${SETTINGS_FILENAME}`, LOG_TYPE.error);
+  }
+}
+
+const installRepositoryWithSettings = async (repositoryName: string): Promise<void | Error> => {
+  try {
+    await execCommand(`npm i ${repositoryName} --save-dev`)
+  } catch (err) {
+    log(`Can't find repository, please check param "repo" in your ${SETTINGS_FILENAME} file`, LOG_TYPE.error);
+    throw err
+  }
+}
+
+const readJsonSettingsFile = async (): Promise<object | Error> => {
+  try {
+    const JSONFilePath = path + `/${SETTINGS_FILENAME}`;
+    log(`Try to read settings file in: ${JSONFilePath}`)
+    return await fsPromises.readFile(JSONFilePath);
+  } catch (err) {
+    log(`Error: Cant find settings file`, LOG_TYPE.error);
+    log(`Make sure you have ${SETTINGS_FILENAME} file in your repository`, LOG_TYPE.main);
+    throw err
+  }
+}
+
+const copyFile = async (pathToFile: string, fileName: string) => {
   await fsPromises.copyFile(require.resolve(pathToFile), `${path}/${fileName}`);
 }
-
 
 const execCommand = (command: string) => new Promise<void>((resolve, reject) => {
   const child = exec(command);
@@ -64,9 +100,9 @@ const execCommand = (command: string) => new Promise<void>((resolve, reject) => 
   } );
 
   child.on( 'close', ( code: any ) => {
-    console.log( `child process exited with code ${ code }` );
     resolve();
   } );
 })
 
 install().then()
+
