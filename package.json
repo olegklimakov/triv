@@ -1,6 +1,6 @@
 {
   "name": "triv",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "Tools which allows you to automate your routine. Starter for your projects. With this tools it is ez to start development with your favorite tools",
   "main": "index.js",
   "scripts": {
