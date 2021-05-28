@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "ts-node src/index.ts",
     "build": "tsc",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint \"**/*.{ts,tsx}\" --fix"
   },
   "bin": {
     "triv": "./dist/index.js"
@@ -26,10 +27,14 @@
   "devDependencies": {
     "@types/node": "^15.6.0",
     "@typescript-eslint/eslint-plugin": "^4.25.0",
+    "@typescript-eslint/parser": "^4.25.0",
+    "eslint": "^7.27.0",
+    "eslint-config-airbnb-base": "^14.2.1",
     "eslint-config-airbnb-typescript": "^12.3.1",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.23.3",
-    "husky": "^6.0.0",
+    "husky": "^4.3.8",
+    "lint-staged": "^11.0.0",
     "prettier": "^2.3.0",
     "settings-storage": "git+https://github.com/olegklimakov/settings-storage.git",
     "ts-node": "^10.0.0",
@@ -41,6 +46,10 @@
     }
   },
   "lint-staged": {
-    "{src}/**/*": "prettier --write --ignore-unknown"
+    "{src}/**/*": [
+      "prettier --write",
+      "eslint --fix",
+      "git add"
+    ]
   }
 }
