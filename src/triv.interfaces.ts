@@ -1,6 +1,7 @@
 export interface TrivInstructionDirectory {
   name: string;
   path: string;
+  instruction?: TrivInstruction;
 }
 
 export interface JsonHook {
@@ -14,6 +15,10 @@ export interface TrivInstruction {
   packageJsonHooks: JsonHook[];
 }
 
+export interface TrivInitialInstruction {
+  [key: string]: TrivInstruction;
+}
+
 export enum PACKAGE_MANAGER {
   'yarn' = 'yarn',
   'npm' = 'npm',
@@ -22,6 +27,6 @@ export enum PACKAGE_MANAGER {
 export interface TrivJSON {
   repo: string;
   name: string;
-  folder: string;
+  tech: string;
   manager: PACKAGE_MANAGER;
 }

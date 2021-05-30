@@ -6,11 +6,11 @@ export const installDependency = async (name: string, dev = true): Promise<any> 
   let command;
   switch (SETTINGS.manager) {
     case PACKAGE_MANAGER.yarn:
-      command = execCommand(`yarn install ${name} ${dev ? '-D' : ''}`);
+      command = execCommand(`yarn add ${name} ${dev ? '-D' : ''}`);
       break;
     default:
       command = execCommand(`npm i ${name} ${dev ? '--save-dev' : ''}`);
       break;
   }
-  return Promise.resolve(command);
+  return command;
 };

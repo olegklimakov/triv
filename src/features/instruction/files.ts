@@ -1,13 +1,15 @@
 const fsPromises = require('fs').promises;
 
-const copyFile = async (pathToFile: string, fileName: string, execPath: string) => {
-  await fsPromises.copyFile(require.resolve(pathToFile), `${execPath}/${fileName}`);
+const path = process.cwd();
+
+const copyFile = async (pathToFile: string, fileName: string) => {
+  await fsPromises.copyFile(require.resolve(pathToFile), `${path}/${fileName}`);
 };
 
-export const handleFiles = async (files: string[], filePath: string, execPath: string) => {
+export const handleFiles = async (files: string[], filePath: string) => {
   const result = files.reduce((acc: Promise<any>[], file: string) => {
     const pathToFile = `${filePath}/${file}`;
-    const fileResult = copyFile(pathToFile, file, execPath);
+    const fileResult = copyFile(pathToFile, file);
     acc.push(fileResult);
     return acc;
   }, []);

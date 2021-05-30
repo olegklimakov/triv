@@ -3,7 +3,7 @@
 const { exec } = require('child_process');
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const execCommand = (command: string, hasOutput = false) => new Promise<void>(resolve => {
+export const execCommand = (command: string, hasOutput = false) => new Promise<boolean>(resolve => {
   const child = exec(command);
   child.stdout.on('data', (data: any) => {
     if (hasOutput) {
@@ -18,6 +18,6 @@ export const execCommand = (command: string, hasOutput = false) => new Promise<v
   });
 
   child.on('close', () => {
-    resolve();
+    resolve(true);
   });
 });

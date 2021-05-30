@@ -3,7 +3,7 @@ import { PACKAGE_MANAGER, TrivJSON } from '../triv.interfaces';
 const defaultSettings: TrivJSON = {
   repo: '',
   name: '',
-  folder: '',
+  tech: '',
   manager: PACKAGE_MANAGER.npm,
 };
 
@@ -23,6 +23,10 @@ class ParsedSettings {
 
   get manager(): PACKAGE_MANAGER {
     return this.settings.manager;
+  }
+
+  get name(): string {
+    return this.settings.name;
   }
 }
 

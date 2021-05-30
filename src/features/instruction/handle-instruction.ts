@@ -1,41 +1,35 @@
-import { log } from '../../utils/log';
-import { getInstructionFromPackage } from '../get-from-package';
 import { installDevPackages } from './dev-packages';
 import { applyPackageJsonHooks } from './json-hooks';
 import { handleFiles } from './files';
+import { TrivInstruction } from '../../triv.interfaces';
+import { handleDirectories } from './directories';
+import { SETTINGS } from '../../services/parsed-settings';
+import { log } from '../../utils/log';
 
-export const handleInstructions = async (
-  instructionPath: string,
-  repoName: string,
-  execPath: string,
+export const handleInstruction = async (
+  instruction: TrivInstruction,
+  instructionPath: string, // for Files
 ): Promise<void | Error> => {
-  log(`Getting the instruction. Path: ${repoName}/${instructionPath}`);
-  const instruction = await getInstructionFromPackage(`${repoName}/${instructionPath}`);
-
-  if (!instruction || instruction instanceof Error) {
-    throw Error();
-  }
-
-  log('Apply instruction');
-
   if (instruction?.devPackages) {
     await installDevPackages(instruction?.devPackages);
   }
 
   if (instruction?.packageJsonHooks?.length) {
-    await applyPackageJsonHooks(instruction.packageJsonHooks, execPath);
+    await applyPackageJsonHooks(instruction.packageJsonHooks);
   }
 
   if (instruction?.files) {
-    await handleFiles(instruction.files, `${repoName}/${instructionPath}`, execPath);
+    await handleFiles(instruction.files, `${SETTINGS.name}/${instructionPath}`);
   }
 
   if (instruction?.directories) {
-    const directories = instruction.directories.reduce((acc: Promise<any>[], dir) => {
-      const directory = handleInstructions(dir.path, repoName, execPath);
-      acc.push(directory);
-      return acc;
-    }, []);
-    await Promise.all(directories);
+    const dirs = await handleDirectories(instruction.directories);
+    dirs.forEach(dir => {
+      if (!dir.instruction) {
+        return;
+      }
+      log(`Handling instruction ${dir.name}...`);
+      handleInstruction(dir.instruction, dir.path);
+    });
   }
 };

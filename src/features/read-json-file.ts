@@ -3,9 +3,11 @@ import { SETTINGS_FILENAME } from '../config';
 
 const fsPromises = require('fs').promises;
 
-export const readJsonSettingsFile = async (execPath: string): Promise<object | Error> => {
+const path = process.cwd();
+
+export const readJsonSettingsFile = async (): Promise<object | Error> => {
   try {
-    const JSONFilePath = `${execPath}/${SETTINGS_FILENAME}`;
+    const JSONFilePath = `${path}/${SETTINGS_FILENAME}`;
     log(`Try to read settings file in: ${JSONFilePath}`);
     const file = await fsPromises.readFile(JSONFilePath);
     return file;

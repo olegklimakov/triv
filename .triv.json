@@ -1,6 +1,6 @@
 {
   "repo": "https://github.com/olegklimakov/settings-storage.git",
   "name": "settings-storage",
-  "folder": "backend-cli",
+  "tech": "cli",
   "manager": "yarn"
 }

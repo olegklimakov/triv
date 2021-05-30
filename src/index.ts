@@ -2,16 +2,14 @@
 
 import { log, LOG_TYPE } from './utils/log';
 import { TrivJSON } from './triv.interfaces';
-import { makeInstruction } from './features/instruction';
+import { getInstructionByTechType } from './features/instruction';
 import { installRepositoryWithSettings } from './features/install-self';
 import { readJsonSettingsFile } from './features/read-json-file';
 import { SETTINGS } from './services/parsed-settings';
 
-const path = process.cwd();
-
 const install = async () => {
   try {
-    const file = await readJsonSettingsFile(path);
+    const file = await readJsonSettingsFile();
 
     if (typeof file !== 'object') {
       return;
@@ -21,8 +19,10 @@ const install = async () => {
 
     const parsed: TrivJSON = JSON.parse(file.toString());
     SETTINGS.init(parsed);
+
     await installRepositoryWithSettings(parsed.repo);
-    await makeInstruction(parsed, path);
+    await getInstructionByTechType(parsed);
+    log('✨ Success', LOG_TYPE.success);
   } catch (err) {
     log('Error occurred. Finish execution', LOG_TYPE.error);
   }
