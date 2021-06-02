@@ -1,5 +1,7 @@
 /* eslint-disable no-console */
 
+import { log, LOG_TYPE } from './log';
+
 const { exec } = require('child_process');
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -13,7 +15,7 @@ export const execCommand = (command: string, hasOutput = false) => new Promise<b
 
   child.stderr.on('data', (data: any) => {
     if (hasOutput) {
-      console.error(`${data}`);
+      log(`${data}`, LOG_TYPE.error);
     }
   });
 
