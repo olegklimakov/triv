@@ -16,10 +16,9 @@ const install = async () => {
     }
 
     log('Reading done', LOG_TYPE.success);
-
     const parsed: TrivJSON = JSON.parse(file.toString());
+    log('Parsing done', LOG_TYPE.success);
     SETTINGS.init(parsed);
-
     await installRepositoryWithSettings(parsed.repo);
     await getInstructionByTechType(parsed);
     log('✨ Success', LOG_TYPE.success);
